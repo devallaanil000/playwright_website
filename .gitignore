@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Virtual Environment
+playenv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test reports
+reports/
+*.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+playenv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
