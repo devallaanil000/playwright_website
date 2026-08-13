@@ -1,34 +1,53 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
-*.class
-*.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+*.pyc
 
+# =========================
 # Virtual Environment
+# =========================
 playenv/
+venv/
+env/
 
-# OS files
+# =========================
+# Pytest
+# =========================
+.pytest_cache/
+
+# =========================
+# Playwright
+# =========================
+test-results/
+playwright-report/
+
+# =========================
+# Allure
+# =========================
+allure-results/
+allure-report/
+tests/allure-dir/
+
+# =========================
+# Reports
+# =========================
+reports/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS Files
+# =========================
 .DS_Store
 Thumbs.db
 
-# Test reports
-reports/
-*.html
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-playenv/
-__pycache__/
-*.pyc
+# =========================
+# Environment Files
+# =========================
 .env
-.DS_Store
