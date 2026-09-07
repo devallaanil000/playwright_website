@@ -31,42 +31,54 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '''
-                . playenv/bin/activate
-                pytest tests/ --alluredir=allure-results
-                '''
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh '''
+                    . playenv/bin/activate
+                    pytest tests/ --alluredir=allure-results
+                    '''
+                }
             }
         }
 
         stage('Generate Allure Report') {
             steps {
-                sh '''
-                allure generate allure-results -o allure-report --clean
-                '''
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh '''
+                    if command -v allure >/dev/null 2>&1
+                    then
+                        allure generate allure-results -o allure-report --clean
+                    else
+                        echo "Allure not installed. Skipping report generation."
+                    fi
+                    '''
+                }
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
             }
         }
     }
 
     post {
-        always {
-            archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
 
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'allure-report',
-                reportFiles: 'index.html',
-                reportName: 'Allure Report'
-            ])
+        always {
+            echo 'Pipeline execution completed'
         }
 
         success {
-            echo 'Tests Passed'
+            echo 'All stages completed successfully'
+        }
+
+        unstable {
+            echo 'Pipeline completed with warnings'
         }
 
         failure {
-            echo 'Tests Failed'
+            echo 'Pipeline failed'
         }
     }
 }
