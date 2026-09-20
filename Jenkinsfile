@@ -82,7 +82,7 @@ post {
             </p>
             """,
             mimeType: 'text/html',
-            to: 'devallaanil789@gmail.com'
+            to: 'anildevalla18@gmail.com'
         )
     }
 
@@ -105,7 +105,7 @@ post {
             </p>
             """,
             mimeType: 'text/html',
-            to: 'devallaanil789@gmail.com'
+            to: 'anildevalla18@gmail.com'
         )
     }
 }
