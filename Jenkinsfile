@@ -31,54 +31,80 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '''
-                    . playenv/bin/activate
-                    pytest tests/ --alluredir=allure-results
-                    '''
-                }
+                sh '''
+                . playenv/bin/activate
+                pytest tests/ --alluredir=allure-results
+                '''
             }
         }
 
         stage('Generate Allure Report') {
             steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '''
-                    if command -v allure >/dev/null 2>&1
-                    then
-                        allure generate allure-results -o allure-report --clean
-                    else
-                        echo "Allure not installed. Skipping report generation."
-                    fi
-                    '''
-                }
-            }
-        }
-
-        stage('Archive Reports') {
-            steps {
-                archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+                sh '''
+                allure generate allure-results -o allure-report --clean
+                '''
             }
         }
     }
 
     post {
-
         always {
-            echo 'Pipeline execution completed'
+            archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'allure-report',
+                reportFiles: 'index.html',
+                reportName: 'Allure Report'
+            ])
         }
 
         success {
-            echo 'All stages completed successfully'
-        }
+            echo 'Tests Passed'
 
-        unstable {
-            echo 'Pipeline completed with warnings'
+            emailext(
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Playwright Automation Execution Successful</h3>
+
+                <p><b>Job:</b> ${env.JOB_NAME}</p>
+                <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+                <p><b>Status:</b> SUCCESS</p>
+
+                <p>
+                <a href="${env.BUILD_URL}">
+                View Build Details
+                </a>
+                </p>
+                """,
+                mimeType: 'text/html',
+                to: 'devallaanil789@gmail.com'
+            )
         }
 
         failure {
-            echo 'Pipeline failed'
+            echo 'Tests Failed'
+
+            emailext(
+                subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Playwright Automation Execution Failed</h3>
+
+                <p><b>Job:</b> ${env.JOB_NAME}</p>
+                <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+                <p><b>Status:</b> FAILURE</p>
+
+                <p>
+                <a href="${env.BUILD_URL}">
+                View Build Details
+                </a>
+                </p>
+                """,
+                mimeType: 'text/html',
+                to: 'devallaanil789@gmail.com'
+            )
         }
     }
 }
