@@ -50,10 +50,11 @@ stages {
 }
 
 post {
+
     always {
         archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
 
-        publishHTML([
+        publishHTML(target: [
             allowMissing: true,
             alwaysLinkToLastBuild: true,
             keepAll: true,
